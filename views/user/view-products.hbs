@@ -1,0 +1,55 @@
+<div class='col-md-3 pl-3 ml-auto'>
+    <form action='/search' method='post' class="d-flex">
+        <input class="form-control me-2" type="text" placeholder="Search">
+        <button class="btn btn-outline-success">&#128269</button>
+    </form>
+</div>
+
+   
+<section>
+    <div class="container mt-3 p-3">
+        <div class="row">
+          {{#each products}}
+            <div class="col-md-3 p-3">
+                <div class="card" style="width: 15rem; height: auto">
+                <a href="/product-details/{{this._id}}" class=''><img style="width: 13rem; height: 13rem" src='/product-images/{{this._id}}.jpg' class="card-img-top" alt="..."></a>
+                <div class='wishlist'>
+                    <span class='tooltip float-right'>Add to wishlist</span><br>
+                    <a onclick="opacityChange()" id='wish-btn' href="/add-to-wishlist/{{this._id}}" class="btn btn-outline-danger ml-2"><i class="fa fa-heart"></i></a>
+                    
+                </div>
+                  <div class="card-body">
+                      <h5 class="card-title">{{this.name}}</h5>
+                      
+                      <p class="card-text">{{this.description}}</p>
+                      <h6 class="card-text">Price: Rs. {{this.price}}</h6>
+                      {{!-- <a href="/add-to-cart/{{this._id}}" class="btn btn-primary">Add to cart</a>--}}
+                      
+                      <a href="/buy-now/{{this._id}}" class='btn btn-success'>Buy now</a>
+                      <button onclick="addToCart('{{this._id}}')" class="btn btn-primary">Add to cart</button>
+                      
+                  </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</section>
+
+<style>
+    
+
+</style>
+
+<script>
+    document.getElementById('wish-btn').style.opacity=0.2
+    function opacityChange() {
+        var opac=document.getElementById('wish-btn').style.opacity
+        console.log("opacity: ",opac)
+        if(opac==0.2)
+            document.getElementById('wish-btn').style.opacity=1
+        else
+            document.getElementById('wish-btn').style.opacity=0.2
+    }
+</script>
+

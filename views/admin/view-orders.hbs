@@ -1,0 +1,78 @@
+<section>
+
+    <div class="row">
+        <div class="col-md-8 m-auto">
+
+                <h3 class='text-center'>All Order details</h3>
+
+                <div class='pt-5'>
+                    <table class="table" id="ordersTable">
+                        <thead>
+                            <tr>
+                                <th scope="col">Order ID</th>
+                                <th scope="col">User ID</th>
+                                <th scope="col">Date</th>
+                                <th scope="col">Mobile</th>
+                                <th scope="col">Address</th>
+                                <th scope="col">Pincode</th>
+                                <th scope="col">Amount</th>
+                                <th scope="col">Payment</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Ship-Status</th>
+                                <th scope="col">Options</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each orders}}
+                            <tr>
+                                <td>{{this._id}}</td>
+                                <td>{{this.userId}}</td>
+                                <td>{{this.date}}</td>
+                                <td>{{this.address.mobile}}</td>
+                                <td>{{this.address.address}}</td>
+                                <td>{{this.address.pincode}}</td>
+                                <td>{{this.totalAmount}}</td>
+                                <td>{{this.paymentMethod}}</td>
+                                <td>{{this.status}}</td>
+                                <td>{{this.shipStatus}}</td>
+                                <td>
+                                    <a href="/admin/view-order-products/{{this._id}}" class="btn btn-primary">View</a>
+                                    <a href="/cancel-order/{{this._id}}" class="btn btn-danger"
+                                        onclick="return confirm('Are you sure you want to delete this order?')">Delete</a>
+                                    {{!-- <a href="/admin/shipped-status/{{this._id}}" class="btn btn-success">Shipped</a> --}}
+                                    <button onclick="changeShipStatus('{{this._id}}')" class='btn btn-success'>Shipped</button>
+
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+
+        </div>
+    </div>
+</section>
+
+<script>
+    $(function () {
+        $('#ordersTable').DataTable()
+    })
+
+   function changeShipStatus(orderId) {
+    //console.log(orderId)
+    $.ajax({
+        url: '/admin/shipped-status',
+        data: {
+            orderId: orderId
+        },
+        method: 'post',
+        success: (response) => {
+            console.log(response)
+            alert("Changed ship status")
+            location.reload()
+        }
+    })
+}
+
+
+</script>

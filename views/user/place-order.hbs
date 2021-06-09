@@ -1,0 +1,143 @@
+<section>
+    <form action='/place-order' method="POST" id='checkout-form'>
+        <div class="container mt-5 pl-5">
+            <div class="row">
+                <div class="col-md-6 m-auto">
+
+                    <h2 class='text-center'>Enter delivery details</h2>
+                    <div class='mr-5 pt-3'>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input type="text" class="form-control" name="address" placeholder="Address">
+                        </div>
+
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" class="form-control" name="city" placeholder="City">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputState">State</label>
+                            <select id="inputState" class="form-control" name="state">
+                                <option selected>Choose...</option>
+                                <option>Karnataka</option>
+                                <option>Kerala</option>
+                                <option>Delhi</option>
+                                <option>Maharashtra</option>
+                                <option>Tamil Nadu</option>
+                                <option>Telangana</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Pin code</label>
+                            <input type="number" class="form-control" name="pincode" placeholder="Pincode">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Mobile number</label>
+                            <input type="tel" class="form-control" name="mobile" placeholder="Mobile">
+                        </div>
+
+                        <input type="text" name="userId" value="{{user._id}}" hidden>   {{!-- to take user id, the field is set as hidden --}}
+                    </div>
+
+                </div>
+                <div class="col-md-6 m-auto">
+
+                    <div class='ml-5 p-5' style="border-style: solid">
+                        <h4>Total amount: Rs. {{total}}</h4>        {{!-- total amount passed --}}
+                        <hr>
+                        <h5>Select Payment method</h5>
+                        <div class="form-group">
+                            <label class="radio-inline">
+                                <input type="radio" name="payment-method" value="COD" checked> COD
+                            </label>
+                            <br>
+                            <label class="radio-inline">
+                                <input type="radio" name="payment-method" value="Online Payment"> Online Payment
+                            </label>
+                            <br>
+                            <button class="btn btn-primary float-right" type="submit">Check out</button>
+                        </div>
+                    </div>
+                </div>
+           </div>
+        </div>
+    </form>
+
+</section>
+
+<script>
+    $("#checkout-form").submit((e) => {     // 'checkout-form' - id of the form
+        e.preventDefault()                  // prevent default submission
+        $.ajax({                            // calling ajax
+            url: '/place-order',
+            method: 'post',
+            data: $('#checkout-form').serialize(),      // to take all data in the form use serialize()
+            success: (response) => {
+                //alert(response.cod_status)
+                if (response.cod_status) {
+                    location.href = '/order-success'
+                }
+                else {
+                    razorpayPayment(response)       // if not 'cod' calling razorpay
+                }
+            }
+        })
+    })
+    function razorpayPayment(order) {
+        var options = {
+            "key": "rzp_test_ZEcQDaw3Rw8Nju", // Enter the Key ID generated from the Dashboard. only key id, no key secret.
+            "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+            "currency": "INR",
+            "name": "Deepa Corp",
+            "description": "Test Transaction",
+            "image": "https://example.com/your_logo",
+            "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+            "handler": function (response) {
+                //alert(response.razorpay_payment_id);
+                //alert(response.razorpay_order_id);
+                //alert(response.razorpay_signature)
+                //alert(order.amount)
+                //alert(order.id)
+                //console.log(response)
+                verifyPayment(response, order)
+            },
+            "prefill": {                                    // these details can be transferred from server
+                "name": "Deepa George",
+                "email": "deepacatherine@gmail.com",               
+                "contact": "9916841894"
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+        var rzp1 = new Razorpay(options);       // creating a razor pay object with all the 'options' mentioned above (to get the razor pay GUI)
+        rzp1.open();
+    }
+
+    function verifyPayment(payment, order) {
+        $.ajax({
+            url: '/verify-payment',
+            data: {
+                payment,        // pass payment and order details to server
+                order
+            },
+            method: 'post',
+            success: (response) => {
+                //alert(response)
+                if (response.status) {
+                    //alert('Payment success')
+                    location.href = '/order-success'
+                }
+                else
+                    alert('Payment failed')
+            }
+        })
+    }
+
+</script>

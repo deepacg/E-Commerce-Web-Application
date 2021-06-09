@@ -1,0 +1,19 @@
+<div class='container mt-5 p-5' style="border-style: solid">
+<h2 class='text-center'>{{userDetails.name}}</h2>
+<hr>
+<h4>My Details</h4>
+{{#with userDetails}}
+    <p>Mobile: {{address.mobile}}</p>
+    <p>Address: </p>
+    <p>{{address.address}}</p>
+    <p>{{address.city}}</p>
+    <p>{{address.state}}</p>
+    <p>Pincode: {{address.pincode}}</p>
+{{/with}}
+
+<div class='text-center'>
+<a href="/view-orders" class='btn btn-success'>My Orders</a>
+<a href="/wishlist" class='btn btn-warning'>My Wishlist</a>
+<a href="/" class='btn btn-primary'>Continue shopping</a>
+</div>
+</div>

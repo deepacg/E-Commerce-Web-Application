@@ -1,0 +1,65 @@
+<section>
+
+    <div class="row">
+        <div class="col m-auto">
+            <div class="container mt-5 ">
+            {{#if order}}
+            <h3 class='text-center'>My Orders</h3>
+
+            <table class="table" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Order ID</th>
+                        <th scope="col">Mobile</th>
+                        <th scope="col">Address</th>
+                        <th scope="col">Pincode</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Payment</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Ship-Status</th>
+                        <th scope="col">Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each order}}
+                    <tr>
+
+                        <td>{{this.date}}</td>
+                        <td>{{this._id}}</td>
+                        <td>{{this.address.mobile}}</td>
+                        <td>{{this.address.address}}</td>
+                        <td>{{this.address.pincode}}</td>
+                        <td>{{this.totalAmount}}</td>
+                        <td>{{this.paymentMethod}}</td>
+                        <td>{{this.status}}</td>
+                        <td>{{this.shipStatus}}</td>
+                        <td>
+                            <a href="/view-order-products/{{this._id}}" class="btn btn-primary">View Products</a>
+                            <a href="/cancel-order/{{this._id}}" class="btn btn-danger"
+                                onclick="return confirm('Are you sure you want to cancel this order?')">Cancel order</a>
+                            {{!-- {{#if completePayment}}
+                                <a href="" class="btn btn-primary">Complete payment</a>
+                            {{/if}} --}}
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            <div class='text-center mt-4'>
+                <a href="/" class='btn btn-success'>Continue shopping</a>
+            </div>
+            {{else}}
+                <h2 class='text-center mt-5'>You have not placed any orders yet</h2>
+            {{/if}}
+        </div>
+    </div>
+
+    </div>
+</section>
+
+<script>
+    $(function () {
+        $('#ordersTable').DataTable()
+    })
+</script>

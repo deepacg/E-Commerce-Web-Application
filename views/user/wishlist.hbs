@@ -1,0 +1,74 @@
+<section>
+    <div class="row">
+        <div class="col-md-8 m-auto">
+
+            <div class="container mt-5 pl-5">
+                {{#if products}}
+                
+                <h3 class='text-center'>Your Wishlist</h3>
+                <div class='pt-3'>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Item</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Options</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            {{#each products}}
+                            <tr> 
+                                {{!-- {{#each wishlist}} --}}
+                                <td><img style="width: 70px; height: 70px"
+                                        src="/product-images/{{this.product._id}}.jpg"></td>
+                                <td>{{this.product.name}}</td>
+                                <td>Rs. {{this.product.price}}</td>
+                                {{!-- {{/each}} --}}
+                                <td>
+                                    <a href="/add-to-cart-wish/{{this.product._id}}" class="btn btn-success">Add to cart</a>
+                                    
+                                    <button class="remove-item btn btn-danger" onclick="removeItem('{{this.product._id}}','{{this._id}}','{{../user._id}}')">
+                                        Remove
+                                    </button>
+                                    
+                                </td>
+                                
+                            </tr>
+                            {{/each}}
+
+                        </tbody>
+                    </table>
+                </div>
+                {{else}}
+                    <h2 class='text-center'>Your Wishlist is empty</h2>
+                
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+  
+    function removeItem(wishlistId, prodId, userId) {
+
+        $.ajax({
+            url: '/remove-item-wish',
+            data: {
+                wishlistId: wishlistId,
+                prodId: prodId,
+                userId: userId
+            },
+            method: 'post',
+            success: (response) => {
+                console.log(response)
+                alert("Product removed from wishlist")
+                location.reload()
+            }
+        })
+    }
+
+
+</script>

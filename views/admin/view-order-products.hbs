@@ -1,0 +1,43 @@
+<section>
+    <div class="row">
+        <div class="col-md-6 m-auto">
+            <div class="container mt-5 pl-5">
+                <h3 class='text-center'>Ordered Products</h3>
+                <h6 class='text-center pt-3'>Order ID: {{orderId}}</h6>
+                <div class='pt-5'>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Item</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col">Options</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each orderProducts}}
+                            <tr>
+
+                                <td><img style="width: 70px; height: 70px"
+                                        src="/product-images/{{this.product._id}}.jpg"></td>
+                                <td>{{this.product.name}}</td>
+                                <td>Rs. {{this.product.price}}</td>
+                                <td>{{this.quantity}}</td>
+                                <td>
+                                    <a href="/cancel-item/{{this._id}}" class="btn btn-danger"
+                                        onclick="return confirm('Are you sure you want to cancel {{this.product.name}}?')">Cancel item</a>
+                                </td>
+                            </tr>
+                            {{/each}}
+
+                        </tbody>
+                    </table>
+                    <hr>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</section>

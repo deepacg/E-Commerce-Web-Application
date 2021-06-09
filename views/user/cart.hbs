@@ -1,0 +1,117 @@
+<section>
+    <div class="row">
+        <div class="col-md-8 m-auto">
+
+            <div class="container mt-5 pl-5">
+                {{#if products}}
+
+                <h3 class='text-center'>Your Cart</h3>
+                <div class='pt-3'>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Item</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col">Options</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each products}}
+                            <tr>
+                                <td><img style="width: 70px; height: 70px"
+                                        src="/product-images/{{this.product._id}}.jpg"></td>
+                                <td>{{this.product.name}}</td>
+                                <td>Rs. {{this.product.price}}</td>
+                                <td>
+                                    <button class="cart-item-count mr-3 btn btn-primary"
+                                        onclick="changeQuantity('{{this._id}}', '{{this.product._id}}', '{{../user._id}}', -1)">-</button>
+                                    <span id="{{this.product._id}}">{{this.quantity}}</span> {{!-- span id is given as
+                                    product id to identify it uniquely. user id cannot be accesed as user.id becuase it is insde products loop. it can be 
+                                    accessed only as ../user._id --}}
+
+                                    <button class="cart-item-count ml-3 btn btn-primary"
+                                        onclick="changeQuantity('{{this._id}}', '{{this.product._id}}', '{{../user._id}}', 1)">+</button>
+                                </td>
+                                <td>
+                                    <button class="remove-item btn btn-danger" onclick="removeItem('{{this._id}}','{{this.product._id}}', '{{../user._id}}'); 
+                            return confirm('Are you sure you want to remove {{this.product.name}}?')">
+                                        Remove
+                                    </button>
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+                <hr>
+                <div class='float-right mr-5 mt-4'>  
+                    <h3>Total: Rs. <span id="total-val">{{totalValue}}</span></h3>     {{!-- give in span to change it --}}
+                </div>
+                <br><hr class='mt-5'><br>
+                <div class='float-right mr-5'> 
+                    <a href="/place-order/" style="width: 200px" class="btn btn-success btn-lg">Place order</a>
+                </div>
+
+                {{else}}
+                    <h2 class='text-center'>Your Cart is empty</h2>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function changeQuantity(cartId, prodId, userId, count) {
+        let quantity = parseInt(document.getElementById(prodId).innerHTML)  // prodId is the span id of quantity
+        count = parseInt(count)
+        //console.log(userId)     // this console can be seen only in browser's console
+        $.ajax({
+            url: '/change-quantity',        // which route to go
+            data: {                         // which all data to be passed
+                userId: userId,     // userId is passed because session.user cannot be accessed due to using ajax
+                cartId: cartId,
+                prodId: prodId,
+                count: count,
+                quantity: quantity
+            },
+            method: 'post',
+            success: (response) => {
+                if (response.removeProduct) {           // 'removeProduct' status is coming from the js code
+                    alert("Product removed from cart")
+                    location.reload()       // refreshing the page after product is removed to see the changes
+                }
+                else {
+                    //console.log(response)
+                    document.getElementById(prodId).innerHTML = quantity + count    // incrementing (or decrementing) the quantity and setting it to the span id 'prodId'
+                    document.getElementById('total-val').innerHTML = response.total
+                    let cartCount=$('#cart-count').html()       // '#cart-count' is the id given to the span which contains cart count in user header. to update the cart count in user header
+                    cartCount=parseInt(cartCount)+count     // increment or decrement value
+                    $('#cart-count').html(cartCount)
+                }
+
+            }
+        })
+    }
+
+    function removeItem(cartId, prodId, userId) {
+
+        $.ajax({
+            url: '/remove-item',
+            data: {
+                cartId: cartId,
+                prodId: prodId,
+                userId: userId,
+            },
+            method: 'post',
+            success: (response) => {
+                console.log(response)
+                //alert("Product removed from cart")
+                location.reload()
+            }
+        })
+    }
+
+
+</script>

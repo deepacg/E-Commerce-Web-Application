@@ -1,0 +1,226 @@
+<section>
+    <form action='/buy-now' method="POST" id='checkout-form'>
+        <div class="container mt-5 pl-5">
+            <div class="row">
+                <div class="col-md-6 m-auto">
+
+                    <h2 class='text-center'>Enter delivery details</h2>
+                    <div class='mr-5 pt-3'>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input type="text" class="form-control" name="address" placeholder="Address">
+                        </div>
+
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" class="form-control" name="city" placeholder="City">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputState">State</label>
+                            <select id="inputState" class="form-control" name="state">
+                                <option selected>Choose...</option>
+                                <option>Karnataka</option>
+                                <option>Kerala</option>
+                                <option>Delhi</option>
+                                <option>Maharashtra</option>
+                                <option>Tamil Nadu</option>
+                                <option>Telangana</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Pin code</label>
+                            <input type="number" class="form-control" name="pincode" placeholder="Pincode">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Mobile number</label>
+                            <input type="tel" class="form-control" name="mobile" placeholder="Mobile">
+                        </div>
+
+                        <input type="text" name="userId" value="{{user._id}}" hidden>   {{!-- hidden fields --}}
+                        <input type="text" name="prodId" value="{{product._id}}" hidden>
+                        <input type="text" name="price" id="price" value="{{product.price}}" hidden>
+                    </div>
+
+                </div>
+                <div class="col-md-6 m-auto">
+                    
+                    <div class="card m-auto" style="width: 15rem; height: auto">
+                        <img style="width: 13rem; height: 13rem" src='/product-images/{{product._id}}.jpg' class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title">{{product.name}}</h5>
+                            <p class="card-text">Price: Rs. {{product.price}}</p>
+                        
+                            {{!-- <button class="cart-item-count mr-3 btn btn-primary"
+                                onclick="changeQuantity(-1)">-</button>
+                                <span id="quantity">{{quantity}}</span> 
+
+                            <a href="" class="cart-item-count ml-3 btn btn-primary"
+                                onclick="changeQuantity(1)">+</a>
+                            {{!-- <button class="cart-item-count ml-3 btn btn-primary"
+                                onclick="changeQuantity('{{product._id}}', '{{../user._id}}', 1)">+</button> --}} 
+                            <div class="number">
+                                <span class="btn btn-primary minus">-</span>
+                                <input style= "width: 30px; border: none" type="text" id="quantity" value="1"/>
+                                <span class="btn btn-primary plus">+</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class='m-5 p-5' style="border-style: solid">
+                        <h3>Total: Rs. <span id="total-val">{{totalValue}}</span></h3>      
+                        <hr>
+                        <h5>Select Payment method</h5>
+                        <div class="form-group">
+                            <label class="radio-inline">
+                                <input type="radio" name="payment-method" value="COD" checked> COD
+                            </label>
+                            <br>
+                            <label class="radio-inline">
+                                <input type="radio" name="payment-method" value="Online Payment"> Online Payment
+                            </label>
+                            <br>
+                            <button class="btn btn-primary float-right" type="submit">Check out</button>
+                        </div>
+                    </div>
+                </div>
+           </div>
+        </div>
+    </form>
+
+</section>
+
+<script>
+    $("#checkout-form").submit((e) => {     // 'checkout-form' - id of the form
+        e.preventDefault()                  // prevent default submission
+        $.ajax({                            // calling ajax
+            url: '/buy-now',
+            method: 'post',
+            data: $('#checkout-form').serialize(),      // to take all data in the form use serialize()
+            success: (response) => {
+                //alert(response.cod_status)
+                if (response.cod_status) {
+                    location.href = '/order-success'
+                }
+                else {
+                    razorpayPayment(response)
+                }
+            }
+        })
+    })
+    function razorpayPayment(order) {
+        var options = {
+            "key": "rzp_test_ZEcQDaw3Rw8Nju", // Enter the Key ID generated from the Dashboard
+            "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+            "currency": "INR",
+            "name": "Deepa Corp",
+            "description": "Test Transaction",
+            "image": "https://example.com/your_logo",
+            "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+            "handler": function (response) {
+                //alert(response.razorpay_payment_id);
+                //alert(response.razorpay_order_id);
+                //alert(response.razorpay_signature)
+                //alert(order.amount)
+                //alert(order.id)
+
+                verifyPayment(response, order)
+            },
+            "prefill": {
+                "name": "Deepa George",
+                "email": "deepacatherine@gmail.com",
+                "contact": "9916841894"
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+    }
+
+    function verifyPayment(payment, order) {
+        $.ajax({
+            url: '/verify-payment',
+            data: {
+                payment,
+                order
+            },
+            method: 'post',
+            success: (response) => {
+                //alert(response)
+                if (response.status) {
+                    //alert('Payment success')
+                    location.href = '/order-success'
+                }
+                else
+                    alert('Payment failed')
+            }
+        })
+    }
+
+function changeQuantity(count) {
+        let quantity = parseInt(document.getElementById('quantity').innerHTML)  // prodId is the span id of quantity
+        let price = parseInt(document.getElementById('price').innerHTML)
+        //alert(price)
+        count = parseInt(count)
+        quantity = parseInt(quantity)
+        price= parseFloat(price)
+        let totalQuantity = quantity+count
+        alert(quantity)
+        alert(price)
+        //alert(count)
+
+        document.getElementById('quantity').innerHTML = totalQuantity
+        document.getElementById('total-val').innerHTML = totalQuantity*price
+        location.reload()
+        //console.log(userId)     // this console can be seen only in browser's console
+        /*
+        $.ajax({
+            url: '/change-quantity-bn',        // which route to go
+            data: {                         // which all data to be passed
+                userId: userId,     // userId is passed because session.user cannot be accessed due to using ajax
+                prodId: prodId,
+                count: count,
+                quantity: quantity
+            },
+            method: 'post',
+            success: (response) => {
+                if (response.removeProduct) {           // 'removeProduct' status is coming from the js code
+                    alert("Product removed from cart")
+                    location.reload()       // refreshing the page after product is removed to see the changes
+                }
+                else {
+                    //console.log(response)
+                    document.getElementById(prodId).innerHTML = quantity + count    // incrementing (or decrementing) the quantity and setting it to the span id 'prodId'
+                    document.getElementById('total-val').innerHTML = response.total
+
+                }
+
+            }
+        })*/
+    }
+
+    $(document).ready(function() {
+			$('.minus').click(function () {
+				var $input = $(this).parent().find('input');
+				var count = parseInt($input.val()) - 1;
+				count = count < 1 ? 1 : count;
+				$input.val(count);
+				$input.change();
+				return false;
+			});
+			$('.plus').click(function () {
+				var $input = $(this).parent().find('input');
+				$input.val(parseInt($input.val()) + 1);
+				$input.change();
+				return false;
+			});
+		});
+</script>
