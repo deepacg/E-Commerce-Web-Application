@@ -1,4 +1,5 @@
-Ecommerce Web Application
-Online Shopping cart
-Node.js, Mongo DB
-HTML, CSS, Javascript, AJAX, jQuery, Bootstrap
+<h1>Ecommerce Web Application</h1> <br>
+<h2>Online Shopping cart</h2> <br>
+
+HTML, CSS, Javascript, AJAX, jQuery, Bootstrap <br>
+Node.js, Mongo DB 
